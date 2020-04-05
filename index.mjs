@@ -5,6 +5,7 @@ import { promisify } from "util";
 import { rootPage } from "./templates/root.mjs";
 import { channelNe } from "./templates/channelNe.mjs";
 import { channelEx } from "./templates/channelEx.mjs";
+import fetch from "node-fetch";
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
