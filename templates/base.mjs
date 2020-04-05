@@ -5,7 +5,7 @@ export const base = (content) => `<html>
   ${content}
   <footer>
     source code at
-    <a href="https://github.com/">Github<a>
+    <a href="https://github.com/HKalbasi/tele-to-rss">Github<a>
   </footer>
   </body>
 </html>`;
