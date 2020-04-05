@@ -66,10 +66,22 @@ const fetchUpdates = async ({ tc, from }) => {
     }
     else {
       if (cntFail === 5) {
-        return ar;
+        return { last: id - cntFail, messages: ar };
       }
       cntFail += 1;
     }
+  }
+};
+
+const doUpdates = async (tc) => {
+  const f = db[tc];
+  const res = await fetchUpdates({ tc, from: f.last+1 });
+  if (f.last === res.last) return;
+  console.log(`New message @${tc}`);
+  f.last = res.last;
+  f.messages = f.messages.concat(res.messages);
+  if (f.messages.length > 20) {
+    f.messages = f.messages.slice(-20);
   }
 };
 
@@ -103,7 +115,7 @@ const serverBuilder = ({ host }) => http.createServer((req, res) => {
     }
     db[tc] = {
       tc,
-      last: Number(param),
+      last: Number(param)-1,
       messages: [],
     };
     res.end('Your channel added');
@@ -112,10 +124,16 @@ const serverBuilder = ({ host }) => http.createServer((req, res) => {
   res.end('404');
 });
 
+const delay = (ms) => new Promise((res)=>setTimeout(ms, res));
+
 const main = async () => {
-  const { host, port } = await readConfig();
+  const { host, port, updateTime } = await readConfig();
   await readDB();
   serverBuilder({ host }).listen(port);
+  while (true) {
+    await delay(updateTime * 60);
+    await Promise.all(Object.keys(db).map(doUpdates));
+  }
 };
 
 main();
