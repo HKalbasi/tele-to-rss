@@ -6,6 +6,7 @@ import { rootPage } from "./templates/root.mjs";
 import { channelNe } from "./templates/channelNe.mjs";
 import { channelEx } from "./templates/channelEx.mjs";
 import fetch from "node-fetch";
+import { base } from "./templates/base.mjs";
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -112,14 +113,14 @@ const serverBuilder = ({ host }) => http.createServer((req, res) => {
   }
   if (q === 'add') {
     if (db[tc] !== undefined) {
-      res.end('We have your channel');
+      res.end(base('We have your channel'));
     }
     db[tc] = {
       tc,
       last: Number(param)-1,
       messages: [],
     };
-    res.end('Your channel added');
+    res.end(base('Your channel added'));
     return;
   }
   res.end('404');
