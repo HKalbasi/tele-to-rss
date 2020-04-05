@@ -58,7 +58,6 @@ const fetchUpdates = async ({ tc, from }) => {
   const ar = [];
   let cntFail = 0;
   for (let id = from; id < from + 50; id += 1) {
-    console.log(id);
     const x = await fetchMessage({ tc, id });
     if (x.success) {
       cntFail = 0;
