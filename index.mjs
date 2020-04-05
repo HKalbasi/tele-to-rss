@@ -124,7 +124,7 @@ const serverBuilder = ({ host }) => http.createServer((req, res) => {
   res.end('404');
 });
 
-const delay = (ms) => new Promise((res)=>setTimeout(ms, res));
+const delay = (ms) => new Promise((res)=>setTimeout(res, ms));
 
 const main = async () => {
   const { host, port, updateTime } = await readConfig();
