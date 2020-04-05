@@ -67,7 +67,7 @@ const fetchUpdates = async ({ tc, from }) => {
     }
     else {
       if (cntFail === 5) {
-        return { last: id - cntFail, messages: ar };
+        return { last: id - cntFail - 1, messages: ar };
       }
       cntFail += 1;
     }
