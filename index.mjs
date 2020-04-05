@@ -10,11 +10,12 @@ const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
 let db = {};
-const host = '127.0.0.1:14587';
 
 const readDB = async () => {
   db = JSON.parse((await readFile('backup.json')).toString());
 };
+
+const readConfig = async () => JSON.parse((await readFile('config.json')).toString());
 
 const writeDB = async () => {
   await writeFile('backup.json', JSON.stringify(db));
@@ -72,7 +73,7 @@ const fetchUpdates = async ({ tc, from }) => {
   }
 };
 
-const server = http.createServer((req, res) => {
+const serverBuilder = ({ host }) => http.createServer((req, res) => {
   if (req.url === '/') {
     res.end(rootPage({ count: Object.keys(db).length }));
   }
@@ -112,8 +113,9 @@ const server = http.createServer((req, res) => {
 });
 
 const main = async () => {
+  const { host, port } = await readConfig();
   await readDB();
-  server.listen(14587);
+  serverBuilder({ host }).listen(port);
 };
 
 main();
