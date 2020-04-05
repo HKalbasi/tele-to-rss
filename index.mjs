@@ -77,7 +77,7 @@ const fetchUpdates = async ({ tc, from }) => {
 const doUpdates = async (tc) => {
   const f = db[tc];
   const res = await fetchUpdates({ tc, from: f.last+1 });
-  if (f.last === res.last) return;
+  if (res.messages.length === 0) return;
   console.log(`New message @${tc}`);
   f.last = res.last;
   f.messages = f.messages.concat(res.messages);
