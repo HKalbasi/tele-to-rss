@@ -132,8 +132,9 @@ const main = async () => {
   await readDB();
   serverBuilder({ host }).listen(port);
   while (true) {
-    await delay(updateTime * 60);
+    await delay(updateTime * 60000);
     await Promise.all(Object.keys(db).map(doUpdates));
+    await writeDB();
   }
 };
 
