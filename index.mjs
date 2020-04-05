@@ -117,3 +117,22 @@ const main = async () => {
 };
 
 main();
+
+const exitHandler = (options) => async (exitCode) => {
+  console.log('writing');
+  await writeDB();
+  console.log('done');
+  if (options.cleanup) console.log('clean');
+  if (exitCode || exitCode === 0) console.log(exitCode);
+  if (options.exit) process.exit();
+};
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler({exit:true}));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler({exit:true}));
+process.on('SIGUSR2', exitHandler({exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler({exit:true}));
