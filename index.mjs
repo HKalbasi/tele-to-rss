@@ -47,23 +47,19 @@ const getDescription = getMeta('og:description');
 
 const fetchMessage = async ({ tc, id }) => {
   const res = await (await fetch(`https://t.me/${tc}/${id}`)).text();
-  const text = getDescription(res);
-  if (text === `You can view and join @${tc} right away.`) {
-    return { success: false };
-  }
-  return { success: true, text };
+  return getDescription(res);
 };
 
 const fetchUpdates = async ({ tc, from }) => {
+  const failText = await fetchMessage({ tc, id: 100000000});
   const ar = [];
   let cntFail = 0;
   for (let id = from; id < from + 50; id += 1) {
-    const x = await fetchMessage({ tc, id });
-    if (x.success) {
+    const text = await fetchMessage({ tc, id });
+    if (text !== failText) {
       cntFail = 0;
       ar.push({
-        id,
-        text: x.text,
+        id, text,
       });
     }
     else {
@@ -73,6 +69,7 @@ const fetchUpdates = async ({ tc, from }) => {
       cntFail += 1;
     }
   }
+  return { last: from + 40, messages: ar };
 };
 
 const doUpdates = async (tc) => {
