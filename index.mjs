@@ -93,14 +93,19 @@ const findLastId = async ({ tc }) => {
 //findLastId({tc:'sharif_prm'}).then(console.log);
 
 const doUpdates = async (tc) => {
-  const f = db[tc];
-  const res = await fetchUpdates({ tc, from: f.last+1 });
-  if (res.messages.length === 0) return;
-  console.log(`New message @${tc}`);
-  f.last = res.last;
-  f.messages = f.messages.concat(res.messages);
-  if (f.messages.length > 20) {
-    f.messages = f.messages.slice(-20);
+  try {
+    const f = db[tc];
+    const res = await fetchUpdates({ tc, from: f.last+1 });
+    if (res.messages.length === 0) return;
+    console.log(`New message @${tc}`);
+    f.last = res.last;
+    f.messages = f.messages.concat(res.messages);
+    if (f.messages.length > 20) {
+      f.messages = f.messages.slice(-20);
+    }
+  }
+  catch (e) {
+    console.log(e);
   }
 };
 
