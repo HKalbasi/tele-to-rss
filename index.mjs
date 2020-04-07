@@ -90,8 +90,6 @@ const findLastId = async ({ tc }) => {
   return l;
 };
 
-//findLastId({tc:'sharif_prm'}).then(console.log);
-
 const doUpdates = async (tc) => {
   try {
     const f = db[tc];
@@ -109,14 +107,37 @@ const doUpdates = async (tc) => {
   }
 };
 
+const isAdding = {};
+
+const tryToAdd = async ({ tc }) => {
+  try {
+    if (isAdding[tc]) return;
+    isAdding[tc] = true;
+    const last = await findLastId({ tc });
+    if (last === 0) {
+      isAdding[tc] = false;
+      return;
+    }
+    db[tc] = {
+      tc,
+      last: last-1,
+      messages: [],
+    };
+    isAdding[tc] = false;
+  }
+  catch (e) {
+  }
+};
+
 const serverBuilder = ({ host }) => http.createServer((req, res) => {
   if (req.url === '/') {
     res.end(rootPage({ count: Object.keys(db).length }));
   }
-  const [, tc, q, param] = req.url.split('/');
+  const [, tc, q] = req.url.split('/');
   if (q === 'info') {
     const x = db[tc];
     if (x === undefined) {
+      tryToAdd({ tc });
       res.end(channelNe({ tc }));
       return;
     }
@@ -131,18 +152,6 @@ const serverBuilder = ({ host }) => http.createServer((req, res) => {
       return;
     }
     res.end(builder({ host, ...x }));
-    return;
-  }
-  if (q === 'add') {
-    if (db[tc] !== undefined) {
-      res.end(base('We have your channel'));
-    }
-    db[tc] = {
-      tc,
-      last: Number(param)-1,
-      messages: [],
-    };
-    res.end(base('Your channel added'));
     return;
   }
   res.end('404');
