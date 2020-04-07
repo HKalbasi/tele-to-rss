@@ -72,6 +72,26 @@ const fetchUpdates = async ({ tc, from }) => {
   return { last: from + 40, messages: ar };
 };
 
+const findLastId = async ({ tc }) => {
+  const failText = await fetchMessage({ tc, id: 100000000});
+  let l = 1, r = 1e6;
+  while (r - l > 1) {
+    const mid = Math.floor((l + r) / 2);
+    console.log(mid);
+    const ids = [mid, mid+1, mid+2, mid+3, mid+4];
+    const test = await Promise.all(ids.map(id => fetchMessage({ tc, id })));
+    if (test.filter(x => x !== failText).length === 0) {
+      r = mid;
+    }
+    else {
+      l = mid;
+    }
+  }
+  return l;
+};
+
+//findLastId({tc:'sharif_prm'}).then(console.log);
+
 const doUpdates = async (tc) => {
   const f = db[tc];
   const res = await fetchUpdates({ tc, from: f.last+1 });
@@ -95,7 +115,7 @@ const serverBuilder = ({ host }) => http.createServer((req, res) => {
       res.end(channelNe({ tc }));
       return;
     }
-    res.end(channelEx({ host, tc }));
+    res.end(channelEx({ host, ...db[tc] }));
     return;  
   }
   if (q === 'rss.xml') {
